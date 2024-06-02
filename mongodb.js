@@ -15,22 +15,11 @@ export async function uploadData(data) {
     const db = client.db("TwitterData");
     const collection = db.collection("Trends");
 
-    const result = await collection.insertMany(data);
-    console.log(
-      `${result.insertedCount} document was inserted into the database.`
-    );
+    await collection.insertOne(data);
+    console.log(`Document was inserted into the database.`);
   } catch (error) {
     console.error("Error uploading data: ", error);
   } finally {
     await client.close();
   }
 }
-
-const data = [
-  { name: "Alice", age: 25 },
-  { name: "Bob", age: 30 },
-];
-
-uploadData(data)
-  .then(() => console.log("Data upload complete"))
-  .catch(console.error);

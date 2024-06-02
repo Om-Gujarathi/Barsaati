@@ -6,8 +6,9 @@ import {
   twitter_email,
 } from "./constants.js";
 import proxyChain from "proxy-chain";
+import { uploadData } from "./mongodb.js";
 
-async function seleniumPipeline() {
+export async function seleniumPipeline() {
   let driver;
   try {
     const anonymizedProxy = await proxyChain.anonymizeProxy(proxy);
@@ -16,7 +17,6 @@ async function seleniumPipeline() {
     const proxyPort = parsedUrl.port;
 
     const newProxyString = `http://${proxyHost}:${proxyPort}`;
-    console.log("New Proxy String:", newProxyString);
     driver = await new Builder()
       .withCapabilities({
         proxy: {
@@ -30,7 +30,12 @@ async function seleniumPipeline() {
 
     await driver.manage().window().maximize();
     await driver.get("http://httpbin.org/ip");
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    const preText = await driver.findElement(By.xpath("//pre")).getText();
+    const ipInfo = JSON.parse(preText);
+    console.log("IP Info:", ipInfo.origin);
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     await driver.get("https://x.com/i/flow/login");
 
@@ -89,7 +94,7 @@ async function seleniumPipeline() {
       }
     } catch (error) {
       console.log(error);
-      console.log("Error in Unusual login prompt.");
+      console.log("Didnt detect Unusual login prompt.");
     }
 
     const passwordField = await driver.wait(
@@ -124,11 +129,22 @@ async function seleniumPipeline() {
     }
     console.log(hashTagsList);
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const finalData = {
+      trends: hashTagsList,
+      timestamp: new Date(),
+      id: Math.floor(Math.random() * 1000000),
+      ip: ipInfo.origin,
+    };
+
+    uploadData(finalData).then(() => {
+      console.log("Data upload complete");
+    });
+
+    return finalData;
   } catch (e) {
     console.log(e);
   } finally {
     await driver.quit();
   }
 }
-
-await seleniumPipeline();

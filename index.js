@@ -1,30 +1,27 @@
-const { By, Builder, Browser } = require("selenium-webdriver");
-const assert = require("assert");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { seleniumPipeline } from "./twitter.js";
 
-(async function firstTest() {
-  let driver;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const publicDirectoryPath = path.join(__dirname, "public");
 
-  try {
-    driver = await new Builder().forBrowser(Browser.CHROME).build();
-    await driver.get("https://www.selenium.dev/selenium/web/web-form.html");
+const app = express();
+app.use(express.static(path.join(__dirname, "public")));
 
-    let title = await driver.getTitle();
-    assert.equal("Web form", title);
+app.get("/", async (req, res) => {
+  res.sendFile(path.join(publicDirectoryPath, "index.html"));
+});
 
-    await driver.manage().setTimeouts({ implicit: 500 });
+app.get("/run-selenium-script", async (req, res) => {
+  // const { runSeleniumScript } = require("./selenium");
+  // await runSeleniumScript();
+  const result = await seleniumPipeline();
+  res.send(result);
+});
 
-    let textBox = await driver.findElement(By.name("my-text"));
-    let submitButton = await driver.findElement(By.css("button"));
-
-    await textBox.sendKeys("Selenium");
-    await submitButton.click();
-
-    let message = await driver.findElement(By.id("message"));
-    let value = await message.getText();
-    assert.equal("Received!", value);
-  } catch (e) {
-    console.log(e);
-  } finally {
-    await driver.quit();
-  }
-})();
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
