@@ -16,8 +16,6 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/run-selenium-script", async (req, res) => {
-  // const { runSeleniumScript } = require("./selenium");
-  // await runSeleniumScript();
   const result = await seleniumPipeline();
   res.send(result);
 });

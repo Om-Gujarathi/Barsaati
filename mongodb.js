@@ -8,15 +8,22 @@ const client = new MongoClient(mongo_url, {
     deprecationErrors: true,
   },
 });
-await client.connect();
+
 
 export async function uploadData(data) {
   try {
+    await client.connect();
     const db = client.db("TwitterData");
     const collection = db.collection("Trends");
 
-    await collection.insertOne(data);
+    const result = await collection.insertOne(data);
     console.log(`Document was inserted into the database.`);
+
+    const insertedDocument = await collection.findOne({
+      _id: result.insertedId,
+    });
+
+    return insertedDocument;
   } catch (error) {
     console.error("Error uploading data: ", error);
   } finally {

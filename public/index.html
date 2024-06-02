@@ -26,6 +26,8 @@
                               .join("")}
                         </ul>
                         <p>The IP address used for this query was ${data.ip}</p>
+                        <p>Here's a JSON extract of this record from the MongoDB:</p>
+                        <pre>${JSON.stringify(data.mongoDoc, null, 2)}</pre>
                         <button id="run-again">Click here to run the query again</button>
                     `;
 

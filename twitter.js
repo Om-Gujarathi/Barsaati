@@ -127,9 +127,9 @@ export async function seleniumPipeline() {
       const mainTag = innerText.split("\n")[1].trim();
       hashTagsList.push(mainTag);
     }
-    console.log(hashTagsList);
     await new Promise((resolve) => setTimeout(resolve, 2000));
-
+    // take top 5 elements from tags list
+    hashTagsList.splice(5);
     const finalData = {
       trends: hashTagsList,
       timestamp: new Date(),
@@ -137,11 +137,8 @@ export async function seleniumPipeline() {
       ip: ipInfo.origin,
     };
 
-    uploadData(finalData).then(() => {
-      console.log("Data upload complete");
-    });
-
-    return finalData;
+    const mongoDoc = await uploadData(finalData);
+    return {...finalData, mongoDoc};
   } catch (e) {
     console.log(e);
   } finally {
