@@ -128,7 +128,6 @@ export async function seleniumPipeline() {
       hashTagsList.push(mainTag);
     }
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    // take top 5 elements from tags list
     hashTagsList.splice(5);
     const finalData = {
       trends: hashTagsList,
