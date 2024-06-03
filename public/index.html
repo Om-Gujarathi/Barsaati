@@ -16,10 +16,15 @@
           .then((response) => response.json())
           .then((data) => {
             const resultsDiv = document.getElementById("results");
+            const date = new Date(data.timestamp);
+            const dayAndTime = date.toLocaleString('en-US', {
+              weekday: 'long',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true,
+            });
             resultsDiv.innerHTML = `
-                        <p>These are the most happening topics as on ${
-                          data.timestamp
-                        }</p>
+                        <p>These are the most happening topics as on ${dayAndTime}</p>
                         <ul>
                             ${data.trends
                               .map((trend) => `<li>${trend}</li>`)
